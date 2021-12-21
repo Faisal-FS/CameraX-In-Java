@@ -14,16 +14,20 @@ import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.lifecycle.LifecycleOwner;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
@@ -34,6 +38,7 @@ import android.widget.Toast;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import java.io.File;
+import java.net.URI;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -137,15 +142,12 @@ public class MainActivity extends AppCompatActivity implements ImageAnalysis.Ana
     @SuppressLint("RestrictedApi")
     private void recordVideo() {
         if (videoCapture != null) {
-            File movieDir = new File("/mnt/sdcard/Movies/CameraXMovies");
 
-            if(!movieDir.exists())
-                movieDir.mkdir();
+            long timestamp = System.currentTimeMillis();
 
-            Date date = new Date();
-            String timestamp = String.valueOf(date.getTime());
-            String vidFilePath = movieDir.getAbsolutePath() + "/" + timestamp + ".mp4";
-            File vidFile = new File(vidFilePath);
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, timestamp);
+            contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4");
 
             try {
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
@@ -159,7 +161,11 @@ public class MainActivity extends AppCompatActivity implements ImageAnalysis.Ana
                     return;
                 }
                 videoCapture.startRecording(
-                        new VideoCapture.OutputFileOptions.Builder(vidFile).build(),
+                        new VideoCapture.OutputFileOptions.Builder(
+                                getContentResolver(),
+                                MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                                contentValues
+                        ).build(),
                         getExecutor(),
                         new VideoCapture.OnVideoSavedCallback() {
                             @Override
@@ -181,18 +187,20 @@ public class MainActivity extends AppCompatActivity implements ImageAnalysis.Ana
     }
 
     private void capturePhoto() {
-        File photoDir = new File("/mnt/sdcard/Pictures/CameraXPhotos");
+        long timestamp = System.currentTimeMillis();
 
-        if(!photoDir.exists())
-            photoDir.mkdir();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, timestamp);
+        contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg");
 
-        Date date = new Date();
-        String timestamp = String.valueOf(date.getTime());
-        String photoFilePath = photoDir.getAbsolutePath() + "/" + timestamp + ".jpg";
-        File photoFile = new File(photoFilePath);
+
 
         imageCapture.takePicture(
-                new ImageCapture.OutputFileOptions.Builder(photoFile).build(),
+                new ImageCapture.OutputFileOptions.Builder(
+                        getContentResolver(),
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                        contentValues
+                ).build(),
                 getExecutor(),
                 new ImageCapture.OnImageSavedCallback() {
                     @Override
