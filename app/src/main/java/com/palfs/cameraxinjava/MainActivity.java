@@ -3,6 +3,7 @@ package com.palfs.cameraxinjava;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageCapture;
@@ -22,6 +23,11 @@ import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -33,6 +39,8 @@ import android.util.Size;
 import android.view.Surface;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.common.util.concurrent.ListenableFuture;
@@ -46,6 +54,8 @@ import java.util.concurrent.Executor;
 public class MainActivity extends AppCompatActivity implements ImageAnalysis.Analyzer, View.OnClickListener {
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
 
+    ImageView grayView;
+
     PreviewView previewView;
     private ImageCapture imageCapture;
     private VideoCapture videoCapture;
@@ -58,6 +68,21 @@ public class MainActivity extends AppCompatActivity implements ImageAnalysis.Ana
         setContentView(R.layout.activity_main);
 
         previewView = findViewById(R.id.previewView);
+        grayView = findViewById(R.id.grayView);
+
+        grayView.setVisibility(View.GONE);
+        SwitchCompat graySwitch = findViewById(R.id.grayscaleSwitch);
+        graySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked){
+                    grayView.setVisibility(View.VISIBLE);
+                } else {
+                    grayView.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+
         bCapture = findViewById(R.id.bCapture);
         bRecord = findViewById(R.id.bRecord);
         bRecord.setText("start recording"); // Set the initial text of the button
@@ -109,15 +134,49 @@ public class MainActivity extends AppCompatActivity implements ImageAnalysis.Ana
         imageAnalysis.setAnalyzer(getExecutor(), this);
 
         //bind to lifecycle:
-        cameraProvider.bindToLifecycle((LifecycleOwner) this, cameraSelector, preview, imageCapture, videoCapture);
+        cameraProvider.bindToLifecycle((LifecycleOwner) this, cameraSelector, preview, imageCapture, imageAnalysis);
     }
 
     @Override
     public void analyze(@NonNull ImageProxy image) {
         // image processing here for the current frame
         Log.d("TAG", "analyze: got the frame at: " + image.getImageInfo().getTimestamp());
+
+        final Bitmap bitmap = previewView.getBitmap();
+
         image.close();
+
+        if (bitmap == null)
+            return;
+
+        final Bitmap bitmap1 = toGrayscale(bitmap);
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                grayView.setImageBitmap(bitmap1);
+            }
+        });
+
     }
+
+    private Bitmap toGrayscale(Bitmap bmpOriginal) {
+
+        int width, height;
+        height = bmpOriginal.getHeight();
+        width = bmpOriginal.getWidth();
+
+        Bitmap bmpGrayscale = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(bmpGrayscale);
+        Paint paint = new Paint();
+        ColorMatrix cm = new ColorMatrix();
+        cm.setSaturation(0);
+        ColorMatrixColorFilter f = new ColorMatrixColorFilter(cm);
+        paint.setColorFilter(f);
+        c.drawBitmap(bmpOriginal, 0, 0, paint);
+        return bmpGrayscale;
+    }
+
 
     @SuppressLint("RestrictedApi")
     @Override
