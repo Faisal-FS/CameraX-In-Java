@@ -1,10 +1,10 @@
-# CameraX-In-Java
-Implementation of CameraX In Java.
+# CameraX In Java Realtime preview to grayscale
+Implementation of Image Analysis Use Case In CameraX In Java to convert real time preview to grayscale.
 
 ### Tutorial
-This project is a reference code made for the video 'Camera X in Java | Image Capture, Video Capture, Image Analysis'.
+This project is a reference code made for the video 'Camera X Image Analysis Convert Realtime Preview To Grayscale In Java'.
 
-Link: https://youtu.be/IrwhjDtpIU0
+Link: https://youtu.be/4vv2PtfdWRQ
 
 ## Getting Started
 
@@ -23,18 +23,6 @@ git clone git@github.com:Faisal-FS/CameraX-In-Java.git
 ```
 
 ## Configuration
-### Gradle Dependencies:
-```
-dependencies {
-    def cameraxVersion = "1.1.0-alpha05"
-    implementation "androidx.camera:camera-core:${cameraxVersion}"
-    implementation "androidx.camera:camera-camera2:${cameraxVersion}"
-    implementation "androidx.camera:camera-lifecycle:${cameraxVersion}"
-
-    // CameraX View class
-    implementation 'androidx.camera:camera-view:1.0.0-alpha25'
-}
-```  
 ### Permissions:
 First enable permissions from the app info in device settings.
 
