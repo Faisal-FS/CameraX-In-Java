@@ -6,6 +6,21 @@ This project is a reference code made for the video 'Camera X in Java | Image Ca
 
 Link: https://youtu.be/IrwhjDtpIU0
 
+### Features
+- Captures the photo via front camera or rear camera
+- Records the video
+- Perform real time analysis on the frames
+- Android 13 supported
+
+### Screenshots
+| HOME |
+|:-:|
+| ![home](home.png?raw=true "home") |
+
+| Image Capture | Video Capture |
+|:-:|:-:|
+| ![Image Capture](image_capture.png?raw=true "image_capture") | ![Video Capture](video_capture.png?raw=true "video_capture") |
+
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine.
