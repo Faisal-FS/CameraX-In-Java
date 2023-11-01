@@ -6,6 +6,15 @@ This project is a reference code made for the video 'Camera X Image Analysis Con
 
 Link: https://youtu.be/4vv2PtfdWRQ
 
+
+### Features
+- Converts preview to grayscale in realtime
+
+### Screenshots
+| Colored & Grayscale |
+|:-:|
+| ![Colored & Grayscale](convert_grayscale.jpg?raw=true "converted_to_grayscale") |
+
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine.
